@@ -16,10 +16,17 @@ os.makedirs(BASE_DIR, exist_ok=True)
 
 app = Flask(__name__)
 
+# ========================
+# 기본 확인
+# ========================
+
 @app.route("/")
 def index():
     return "PHOTO BOOTH SERVER OK"
 
+# ========================
+# 업로드
+# ========================
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -38,13 +45,15 @@ def upload():
 
     return jsonify({
         "id": photo_id,
-        "download_url": f"/photo/{photo_id}"
+        "download_url": f"/photos/{photo_id}"
     })
 
+# ========================
+# 다운로드
+# ========================
 
-@app.route("/photo/<photo_id>")
-def download(photo_id):
-    filename = f"{photo_id}.jpg"
+@app.route("/photos/<path:filename>")
+def download(filename):
     path = os.path.join(BASE_DIR, filename)
 
     if not os.path.exists(path):
@@ -75,7 +84,6 @@ def cleanup_loop():
                         print("[CLEANUP ERROR]", e)
         time.sleep(60)
 
-
 # ========================
 # 서버 시작
 # ========================
@@ -90,7 +98,7 @@ if __name__ == "__main__":
     print("===================================")
 
     app.run(
-        host="0.0.0.0",   # ⭐ 핫스팟에서 접속 가능하게
+        host="0.0.0.0",
         port=PORT,
         debug=False
     )

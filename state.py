@@ -1,5 +1,9 @@
 # state.py
 
+
+import os
+import datetime
+
 class AppState:
     """
     전역 상태를 한 곳에서 관리하는 클래스 (4컷 전용)
@@ -29,5 +33,12 @@ class AppState:
         # 촬영 관련
         self.timelimit = 10     # 한 장 찍기 전 카운트다운 시간
         self.numlimit  = 6      # 총 촬영 장수
+
+        # QR 다운로드용 공유 폴더
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        self.shared_dir = os.path.join("shared_photos")
+
+        # 서버
+        self.server_ip = "10.138.24.168"
 
 state = AppState()

@@ -26,44 +26,60 @@ from windows.qr_window import QRWindow
 
 
 
+import os
+import cv2
+import datetime
+
+from PyQt5 import uic
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtCore import QSize
+from PyQt5.QtWidgets import QMessageBox
+
+from windows.base import BaseWindow
+from windows.qr_window import QRWindow
+from utils.qr import make_qr
+from state import state
+
+
 class PhotoSelectWindow_4(BaseWindow):
     """
     6장 중 4장을 선택해서 최종 4컷 결과물을 만드는 화면
     """
+
     def __init__(self):
         super().__init__()
         uic.loadUi("./page_ui_v3/photo_select_4.ui", self)
 
+        # =========================
+        # 디렉토리 준비
+        # =========================
         self.photo_dir = state.session1_dir
         self.photos = sorted(os.listdir(self.photo_dir))
 
         img_dir = state.session2_dir
         os.makedirs(img_dir, exist_ok=True)
 
-        # Session1의 마지막 6장을 잘라서 Session2에 CUT_XXXXX 형식으로 저장
+        # =========================
+        # Session1 → Session2 (CUT)
+        # =========================
         for i in range(6, 0, -1):
             if len(self.photos) < i:
                 continue
+
             src_path = os.path.join(self.photo_dir, self.photos[-i])
             cut_img = self._cut_for_4cut(src_path)
 
             existing = sorted(os.listdir(img_dir))
-            if existing:
-                last_name = existing[-1]
-                try:
-                    num = int(last_name[-8:-4]) + 1
-                except ValueError:
-                    num = 1
-            else:
-                num = 1
-            name = (f"CUT_{num:05d}.jpg")
-            dst_path = os.path.join(img_dir, name)
-            cv2.imwrite(dst_path, cut_img)
+            num = int(existing[-1][-8:-4]) + 1 if existing else 1
+            name = f"CUT_{num:05d}.jpg"
+            cv2.imwrite(os.path.join(img_dir, name), cut_img)
 
-        self.cut_files = sorted(os.listdir(img_dir))[-6:]  # 최근 6개만 사용
+        self.cut_files = sorted(os.listdir(img_dir))[-6:]
         self.cut_files = [os.path.join(img_dir, f) for f in self.cut_files]
 
-        # 미리보기 썸네일
+        # =========================
+        # UI 썸네일
+        # =========================
         self.photo.setPixmap(QPixmap('./white.png'))
         self.photo_1.setPixmap(QPixmap(self.cut_files[0]).scaled(QSize(450, 300)))
         self.photo_2.setPixmap(QPixmap(self.cut_files[1]).scaled(QSize(450, 300)))
@@ -72,13 +88,16 @@ class PhotoSelectWindow_4(BaseWindow):
         self.photo_5.setPixmap(QPixmap(self.cut_files[4]).scaled(QSize(450, 300)))
         self.photo_6.setPixmap(QPixmap(self.cut_files[5]).scaled(QSize(450, 300)))
 
+        # =========================
         # 선택 상태
-        state.selected = [0, 0, 0, 0]  # 4장
-        self.button_slots = [-1] * 6   # 각 버튼이 어떤 slot(0~3)에 매핑됐는지
-
+        # =========================
+        state.selected = [0, 0, 0, 0]
+        self.button_slots = [-1] * 6
         self.result_image = None
 
-        # 사진 선택 버튼
+        # =========================
+        # 버튼 연결
+        # =========================
         self.photo_choice_1.clicked.connect(lambda: self._toggle_select(0, self.photo_1))
         self.photo_choice_2.clicked.connect(lambda: self._toggle_select(1, self.photo_2))
         self.photo_choice_3.clicked.connect(lambda: self._toggle_select(2, self.photo_3))
@@ -88,13 +107,13 @@ class PhotoSelectWindow_4(BaseWindow):
 
         self.move_next.clicked.connect(self._on_next)
 
-        # 초기 미리보기
         self._update_preview()
 
-    def _cut_for_4cut(self, file_path: str):
-        """
-        원본 사진을 4컷 비율(45:64)에 맞춰 중앙 crop
-        """
+    # =====================================================
+    # 이미지 처리
+    # =====================================================
+
+    def _cut_for_4cut(self, file_path):
         image = cv2.imread(file_path)
         image = cv2.resize(image, (2736, 1824), cv2.INTER_CUBIC)
 
@@ -104,136 +123,89 @@ class PhotoSelectWindow_4(BaseWindow):
 
         if cur_ratio > target_ratio:
             new_w = int(h * target_ratio)
-            start_x = (w - new_w) // 2
-            cropped = image[:, start_x:start_x + new_w]
+            x = (w - new_w) // 2
+            return image[:, x:x + new_w]
         else:
             new_h = int(w / target_ratio)
-            start_y = (h - new_h) // 2
-            cropped = image[start_y:start_y + new_h, :]
-
-        return cropped
+            y = (h - new_h) // 2
+            return image[y:y + new_h, :]
 
     def _merge_4cut(self, frame_path, f1, f2, f3, f4):
-        """
-        4장의 사진과 프레임 PNG를 합성
-        """
-        main_image = cv2.imread('./white.png', cv2.IMREAD_COLOR)
+        main_image = cv2.imread('./white.png')
 
-        def safe_path(p):
-            return p if p else './white_5.png'
+        def safe(p): return p if p else './white_5.png'
 
-        f1 = safe_path(f1)
-        f2 = safe_path(f2)
-        f3 = safe_path(f3)
-        f4 = safe_path(f4)
+        imgs = [cv2.resize(self._cut_for_4cut(safe(p)), None, None, 0.415, 0.415)
+                for p in (f1, f2, f3, f4)]
 
-        img1 = self._cut_for_4cut(f1)
-        img2 = self._cut_for_4cut(f2)
-        img3 = self._cut_for_4cut(f3)
-        img4 = self._cut_for_4cut(f4)
+        coords = [(47,165),(47,944),(602,165),(602,944)]
+        ih, iw, _ = imgs[0].shape
 
-        frame = cv2.imread(frame_path, cv2.IMREAD_COLOR)
-        mask = cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)[:, :, 3]
-        mask = cv2.bitwise_not(mask)
+        for img, (x, y) in zip(imgs, coords):
+            main_image[y:y+ih, x:x+iw] = img
 
-        m = 0.415
-        img1 = cv2.resize(img1, None, None, m, m, cv2.INTER_CUBIC)
-        img2 = cv2.resize(img2, None, None, m, m, cv2.INTER_CUBIC)
-        img3 = cv2.resize(img3, None, None, m, m, cv2.INTER_CUBIC)
-        img4 = cv2.resize(img4, None, None, m, m, cv2.INTER_CUBIC)
-
-        x1, y1 = 47, 165
-        x2, y2 = 47, 944
-        x3, y3 = 602, 165
-        x4, y4 = 602, 944
-
-        ih, iw, _ = img1.shape
-        main_image[y1:y1+ih, x1:x1+iw] = img1
-        main_image[y2:y2+ih, x2:x2+iw] = img2
-        main_image[y3:y3+ih, x3:x3+iw] = img3
-        main_image[y4:y4+ih, x4:x4+iw] = img4
-
+        frame = cv2.imread(frame_path)
+        mask = cv2.bitwise_not(cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)[:,:,3])
         cv2.copyTo(main_image, mask, frame)
         return frame
 
     def _update_preview(self):
-        """
-        선택된 사진 4장으로 미리보기 이미지 업데이트
-        """
-        frame_path = state.frame_path
-        img_1, img_2, img_3, img_4 = state.selected
-
-        res = self._merge_4cut(frame_path, img_1, img_2, img_3, img_4)
+        res = self._merge_4cut(state.frame_path, *state.selected)
         self.result_image = res
 
-        res_rgb = cv2.cvtColor(res, cv2.COLOR_BGR2RGB)
-        res_rgb = cv2.resize(res_rgb, (510, 740))
+        rgb = cv2.cvtColor(res, cv2.COLOR_BGR2RGB)
+        rgb = cv2.resize(rgb, (510, 740))
+        h, w, c = rgb.shape
 
-        h, w, c = res_rgb.shape
-        qImg = QImage(res_rgb.data, w, h, w * c, QImage.Format_RGB888)
-        pixmap = QPixmap.fromImage(qImg)
+        qimg = QImage(rgb.data, w, h, w*c, QImage.Format_RGB888)
+        self.photo.setPixmap(QPixmap.fromImage(qimg))
 
-        self.photo.setPixmap(pixmap)
-
-    def _toggle_select(self, idx: int, widget):
-        """
-        6개 후보 중 idx번째 사진 선택/해제
-        """
+    def _toggle_select(self, idx, widget):
         if self.button_slots[idx] == -1:
-            # 아직 선택 안 된 버튼 → 선택 시도
-            slot = -1
-            for i in range(4):
-                if state.selected[i] == 0:
-                    slot = i
-                    break
-
-            if slot == -1:
-                # 이미 4장 다 선택됨
+            try:
+                slot = state.selected.index(0)
+            except ValueError:
                 return
-
             self.button_slots[idx] = slot
             state.selected[slot] = self.cut_files[idx]
             widget.setStyleSheet("border: 4px solid #DA5451;")
         else:
-            # 이미 선택된 버튼 → 해제
             slot = self.button_slots[idx]
             state.selected[slot] = 0
             self.button_slots[idx] = -1
-            widget.setStyleSheet("border: 0px solid red;")
+            widget.setStyleSheet("border: 0px;")
 
         self._update_preview()
+
+    # =====================================================
+    # 다음 단계 (저장 + QR)
+    # =====================================================
 
     def _on_next(self):
         if not all(state.selected):
             QMessageBox.about(self, '충곽한컷', '사진 4장을 모두 선택해주세요')
             return
 
-        # 1. 결과 이미지 저장
-        now = datetime.datetime.now()
-        now_str = now.strftime('%Y%m%d%H%M%S')
-        os.makedirs(state.result_dir, exist_ok=True)
-        save_path = os.path.join(state.result_dir, f'{now_str}.jpg')
-        cv2.imwrite(save_path, self.result_image)
+        os.makedirs(state.shared_dir, exist_ok=True)
 
-        try:
-            # 2. 서버로 업로드
-            download_url = upload_photo(save_path)
+        now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        photo_filename = f"photo_{now}.jpg"
+        photo_path = os.path.join(state.shared_dir, photo_filename)
 
-            # 3. QR 코드 생성
-            qr_path = make_qr(download_url)
+        cv2.imwrite(photo_path, self.result_image)
 
-        except Exception as e:
-            QMessageBox.about(
-                self,
-                '오류',
-                f'사진 업로드 중 오류가 발생했습니다.\n{e}'
-            )
-            return
+        download_url = f"http://{state.server_ip}:5000/photos/{photo_filename}"
 
-        # 4. QR 화면으로 이동
-        self.w = QRWindow(qr_path, save_path)
+        qr_path = make_qr(
+            download_url=download_url,
+            save_dir=state.shared_dir,
+            photo_id=now
+        )
+
+        self.w = QRWindow(qr_path, photo_path)
         self.w.showFullScreen()
         self.close()
+
 
 
 class GoodbyeWindow(BaseWindow):
