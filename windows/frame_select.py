@@ -28,6 +28,15 @@ class FrameSelectWindow_4(BaseWindow):
         self.frame_choice_1.clicked.connect(lambda: self.select_frame(1))
         self.frame_choice_2.clicked.connect(lambda: self.select_frame(2))
         self.frame_choice_3.clicked.connect(lambda: self.select_frame(3))
+        self.frame_choice_4.clicked.connect(lambda: self.select_frame(4))
+        self.frame_choice_5.clicked.connect(lambda: self.select_frame(5))
+        self.frame_choice_6.clicked.connect(lambda: self.select_frame(6))
+        self.frame_choice_7.clicked.connect(lambda: self.select_frame(7))
+        self.frame_choice_8.clicked.connect(lambda: self.select_frame(8))
+        self.frame_choice_9.clicked.connect(lambda: self.select_frame(9))
+        self.frame_choice_10.clicked.connect(lambda: self.select_frame(10))
+        self.frame_choice_11.clicked.connect(lambda: self.select_frame(11))
+        self.frame_choice_12.clicked.connect(lambda: self.select_frame(12))
 
     def select_frame(self, n: int):
         """
@@ -41,7 +50,7 @@ class FrameSelectWindow_4(BaseWindow):
         """
         선택된 프레임에 체크 표시
         """
-        frames = [self.frame_1, self.frame_2, self.frame_3]
+        frames = [self.frame_1, self.frame_2, self.frame_3, self.frame_4, self.frame_5, self.frame_6, self.frame_7, self.frame_8, self.frame_9, self.frame_10, self.frame_11, self.frame_12]
         for f in frames:
             f.setPixmap(QPixmap())
 
