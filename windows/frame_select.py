@@ -17,7 +17,7 @@ class FrameSelectWindow_4(BaseWindow):
     """
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v4/frame_select_4.ui", self)
+        uic.loadUi("./page_ui_2025/frame_select_4.ui", self)
 
         state.frame_path = None
         state.frame_index = None
@@ -34,7 +34,7 @@ class FrameSelectWindow_4(BaseWindow):
         프레임 번호 n 선택
         """
         self._update_border(n)
-        state.frame_path = f'./frame_v2025/4frame/{n}.png'
+        state.frame_path = f'./frame_2025/{n}.png'
         state.frame_index = n
 
     def _update_border(self, n: int):
@@ -46,7 +46,7 @@ class FrameSelectWindow_4(BaseWindow):
             f.setPixmap(QPixmap())
 
         target = frames[n - 1]
-        target.setPixmap(QPixmap('./img/print_num/check.png'))
+        target.setPixmap(QPixmap('./pages_img_2025/print_num/check.png'))
         target.setScaledContents(True)
 
     def on_prev(self):

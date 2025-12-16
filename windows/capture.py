@@ -25,9 +25,9 @@ class CaptureWindow(BaseWindow):
     """
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v4/capture.ui", self)
+        uic.loadUi("./page_ui_2025/capture.ui", self)
 
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1)
         if not self.cap.isOpened():
             raise RuntimeError("웹캠을 열 수 없습니다.")
 
@@ -162,7 +162,7 @@ class CaptureWindow(BaseWindow):
 
         self.count_label_2.clear()
         self.label_2.setPixmap(
-            QPixmap('./img/pages_v5/슬라이드7.png')
+            QPixmap('./img/pages_img_2025/슬라이드7.png')
         )
 
         QTimer.singleShot(3000, self._go_next)

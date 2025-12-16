@@ -30,7 +30,7 @@ class PhotoSelectWindow_4(BaseWindow):
 
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v4/photo_select_4.ui", self)
+        uic.loadUi("./page_ui_2025/photo_select_4.ui", self)
 
         # =========================
         # 디렉토리 준비
@@ -206,7 +206,7 @@ class PhotoSelectWindow_4(BaseWindow):
 
     def _on_next(self):
         if not all(state.selected):
-            QMessageBox.about(self, '충곽한컷', '사진 4장을 모두 선택해주세요')
+            QMessageBox.about(self, '주토필름', '사진 4장을 모두 선택해주세요')
             return
 
         os.makedirs(state.shared_dir, exist_ok=True)
@@ -239,7 +239,7 @@ class GoodbyeWindow(BaseWindow):
 
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v4/goodbye.ui", self)
+        uic.loadUi("./page_ui_2025/goodbye.ui", self)
 
         # Session1에 흑색 이미지 하나 추가
         photo_dir = state.session1_dir
