@@ -34,7 +34,7 @@ class FrameSelectWindow_4(BaseWindow):
         프레임 번호 n 선택
         """
         self._update_border(n)
-        state.frame_path = f'./frame_v2/{state.size}frame/{n}.png'
+        state.frame_path = f'./frame_v2025/4frame/{n}.png'
         state.frame_index = n
 
     def _update_border(self, n: int):
@@ -58,4 +58,4 @@ class FrameSelectWindow_4(BaseWindow):
             from windows.capture import CaptureWindow
             self.goto(CaptureWindow)
         else:
-            QMessageBox.about(self, '충곽한컷', '프레임을 선택해주세요')
+            QMessageBox.about(self, '주토필름', '프레임을 선택해주세요')

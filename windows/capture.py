@@ -60,7 +60,7 @@ class CaptureWindow(BaseWindow):
     # 4컷 비율 crop (미리보기 + 저장 공통)
     # ==============================
     def _crop_for_4cut(self, img):
-        target_ratio = 45 / 64
+        target_ratio = 4/3
         h, w, _ = img.shape
         cur_ratio = w / h
 
@@ -90,7 +90,7 @@ class CaptureWindow(BaseWindow):
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = self._crop_for_4cut(frame)
-            frame = cv2.resize(frame, (1400, 900))
+            frame = cv2.resize(frame, (1400, 1050))
 
             qImg = qimage2ndarray.array2qimage(frame, normalize=False)
             self.label.setPixmap(QPixmap.fromImage(qImg))

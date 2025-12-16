@@ -40,6 +40,7 @@ class AppState:
 
         # 서버
         #self.server_ip = "10.138.24.168"      # <수정해야할곳>10.138.25.216
-        self.server_ip = "192.168.137.1"      # <수정해야할곳>
+        self.server_ip = "10.138.25.216"      # <수정해야할곳>
+        #self.server_ip = "192.168.137.1"      # <수정해야할곳>
 
 state = AppState()

@@ -6,6 +6,7 @@ PhotoSelectWindow_4, GoodbyeWindow
 import os
 import cv2
 import secrets
+import numpy as np
 
 from PyQt5 import uic
 from PyQt5.QtCore import QSize
@@ -98,7 +99,7 @@ class PhotoSelectWindow_4(BaseWindow):
         image = cv2.imread(file_path)
         image = cv2.resize(image, (2736, 1824), cv2.INTER_CUBIC)
 
-        target_ratio = 45 / 64
+        target_ratio = 4/3
         h, w, _ = image.shape
         cur_ratio = w / h
 
@@ -112,33 +113,71 @@ class PhotoSelectWindow_4(BaseWindow):
             return image[y:y + new_h, :]
 
     def _merge_4cut(self, frame_path, f1, f2, f3, f4):
-        main_image = cv2.imread('./white.png')
-
-        def safe(p): 
+        def safe(p):
             return p if p else './white_5.png'
 
-        imgs = [
-            cv2.resize(self._cut_for_4cut(safe(p)), None, None, 0.415, 0.415)
-            for p in (f1, f2, f3, f4)
-        ]
+        # 프레임(RGBA) 읽기
+        frame_rgba = cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)  # (H,W,4)
+        fh, fw = frame_rgba.shape[:2]
 
-        coords = [(47, 165), (47, 944), (602, 165), (602, 944)]
-        ih, iw, _ = imgs[0].shape
+        # 배경 캔버스(프레임 크기와 동일하게)
+        main_image = cv2.imread('./white.png')
+        if main_image is None or main_image.shape[:2] != (fh, fw):
+            main_image = np.full((fh, fw, 3), 255, dtype=np.uint8)
 
-        for img, (x, y) in zip(imgs, coords):
-            main_image[y:y + ih, x:x + iw] = img
+        alpha = frame_rgba[:, :, 3]
 
-        frame = cv2.imread(frame_path)
-        mask = cv2.bitwise_not(cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)[:, :, 3])
-        cv2.copyTo(main_image, mask, frame)
-        return frame
+        # 프레임에서 "사진이 보여야 하는 창" 찾기: 보통 창 부분이 투명(alpha==0)입니다.
+        win = (alpha == 0).astype(np.uint8) * 255
+
+        contours, _ = cv2.findContours(win, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        rects = [cv2.boundingRect(c) for c in contours]  # (x,y,w,h)
+
+        # 큰 4개만 사용
+        rects = sorted(rects, key=lambda r: r[2]*r[3], reverse=True)[:4]
+
+        # 위/아래 행으로 정렬해서 [좌상, 우상, 좌하, 우하] 순서로 맞춤
+        rects = sorted(rects, key=lambda r: (r[1], r[0]))
+        top = sorted(rects[:2], key=lambda r: r[0])
+        bot = sorted(rects[2:], key=lambda r: r[0])
+        rects = top + bot
+
+        def fit_to_box(img, w, h):
+            ih, iw = img.shape[:2]
+            target = w / h
+            src = iw / ih
+
+            # 비율 맞추기 위해 중앙 크롭
+            if src > target:
+                new_w = int(ih * target)
+                x0 = (iw - new_w) // 2
+                img = img[:, x0:x0 + new_w]
+            else:
+                new_h = int(iw / target)
+                y0 = (ih - new_h) // 2
+                img = img[y0:y0 + new_h, :]
+
+            return cv2.resize(img, (w, h))
+
+        # 사진 4장 붙이기(창 크기에 맞춤)
+        for p, (x, y, w, h) in zip((f1, f2, f3, f4), rects):
+            img = self._cut_for_4cut(safe(p))
+            img = fit_to_box(img, w, h)
+            main_image[y:y+h, x:x+w] = img
+
+        # 프레임 덮기(알파가 있는 부분만)
+        frame_bgr = frame_rgba[:, :, :3]
+        cv2.copyTo(frame_bgr, alpha, main_image)
+
+        return main_image
+
 
     def _update_preview(self):
         res = self._merge_4cut(state.frame_path, *state.selected)
         self.result_image = res
-
+        #res = cv2.rotate(res, cv2.ROTATE_90_CLOCKWISE)
         rgb = cv2.cvtColor(res, cv2.COLOR_BGR2RGB)
-        rgb = cv2.resize(rgb, (510, 740))
+        rgb = cv2.resize(rgb, (910, 615))
         h, w, c = rgb.shape
 
         qimg = QImage(rgb.data, w, h, w * c, QImage.Format_RGB888)
