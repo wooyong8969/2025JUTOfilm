@@ -17,7 +17,8 @@ class QRWindow(QMainWindow):
         self.qr_label.setPixmap(
             QPixmap(qr_path).scaled(
                 self.qr_label.size(),
-                aspectRatioMode=1
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
             )
         )
 

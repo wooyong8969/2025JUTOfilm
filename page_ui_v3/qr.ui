@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>QRWindow</class>
+ <widget class="QMainWindow" name="QRWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -10,11 +10,11 @@
     <height>1080</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>MainWindow</string>
-  </property>
+
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="qr_label">
+
+   <!-- 배경 -->
+   <widget class="QLabel" name="background_label">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -23,28 +23,56 @@
       <height>1080</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
-    </property>
     <property name="pixmap">
      <pixmap>../img/pages_v4/슬라이드11.png</pixmap>
     </property>
    </widget>
+
+   <!-- QR 코드 전용 -->
+   <widget class="QLabel" name="qr_label">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>220</y>
+      <width>600</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+
+   <!-- 출력 버튼 -->
+   <widget class="QPushButton" name="print_button">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>840</y>
+      <width>300</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>출력하기</string>
+    </property>
+   </widget>
+
+   <!-- 종료 버튼 -->
+   <widget class="QPushButton" name="exit_button">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>930</y>
+      <width>300</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>종료</string>
+    </property>
+   </widget>
+
   </widget>
  </widget>
- <widget class="QPushButton" name="print_button">
- <property name="geometry">
-  <rect>
-   <x>810</x>
-   <y>740</y>
-   <width>300</width>
-   <height>80</height>
-  </rect>
- </property>
- <property name="text">
-  <string>출력하기</string>
- </property>
-</widget>
- <resources/>
- <connections/>
 </ui>
