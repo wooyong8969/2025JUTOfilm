@@ -39,6 +39,6 @@ class AppState:
         self.shared_dir = os.path.join("shared_photos")
 
         # 서버
-        self.server_ip = "10.138.24.168"
+        self.server_ip = "10.138.24.168"      # <수정해야할곳>
 
 state = AppState()

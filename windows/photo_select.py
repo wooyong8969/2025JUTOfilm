@@ -3,11 +3,9 @@
 PhotoSelectWindow_4, GoodbyeWindow
 '''
 
-
 import os
-import datetime
-
 import cv2
+import secrets
 
 from PyQt5 import uic
 from PyQt5.QtCore import QSize
@@ -17,23 +15,6 @@ from PyQt5.QtWidgets import QMessageBox
 from PIL import Image, ImageWin, ImageOps
 import win32print
 import win32ui
-
-from windows.base import BaseWindow
-from state import state
-
-from utils.qr import upload_photo, make_qr
-from windows.qr_window import QRWindow
-
-
-
-import os
-import cv2
-import datetime
-
-from PyQt5 import uic
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QMessageBox
 
 from windows.base import BaseWindow
 from windows.qr_window import QRWindow
@@ -133,19 +114,22 @@ class PhotoSelectWindow_4(BaseWindow):
     def _merge_4cut(self, frame_path, f1, f2, f3, f4):
         main_image = cv2.imread('./white.png')
 
-        def safe(p): return p if p else './white_5.png'
+        def safe(p): 
+            return p if p else './white_5.png'
 
-        imgs = [cv2.resize(self._cut_for_4cut(safe(p)), None, None, 0.415, 0.415)
-                for p in (f1, f2, f3, f4)]
+        imgs = [
+            cv2.resize(self._cut_for_4cut(safe(p)), None, None, 0.415, 0.415)
+            for p in (f1, f2, f3, f4)
+        ]
 
-        coords = [(47,165),(47,944),(602,165),(602,944)]
+        coords = [(47, 165), (47, 944), (602, 165), (602, 944)]
         ih, iw, _ = imgs[0].shape
 
         for img, (x, y) in zip(imgs, coords):
-            main_image[y:y+ih, x:x+iw] = img
+            main_image[y:y + ih, x:x + iw] = img
 
         frame = cv2.imread(frame_path)
-        mask = cv2.bitwise_not(cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)[:,:,3])
+        mask = cv2.bitwise_not(cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)[:, :, 3])
         cv2.copyTo(main_image, mask, frame)
         return frame
 
@@ -157,7 +141,7 @@ class PhotoSelectWindow_4(BaseWindow):
         rgb = cv2.resize(rgb, (510, 740))
         h, w, c = rgb.shape
 
-        qimg = QImage(rgb.data, w, h, w*c, QImage.Format_RGB888)
+        qimg = QImage(rgb.data, w, h, w * c, QImage.Format_RGB888)
         self.photo.setPixmap(QPixmap.fromImage(qimg))
 
     def _toggle_select(self, idx, widget):
@@ -188,8 +172,10 @@ class PhotoSelectWindow_4(BaseWindow):
 
         os.makedirs(state.shared_dir, exist_ok=True)
 
-        now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        photo_filename = f"photo_{now}.jpg"
+        # 암호화된 사진 ID
+        photo_id = secrets.token_hex(16)
+
+        photo_filename = f"{photo_id}.jpg"
         photo_path = os.path.join(state.shared_dir, photo_filename)
 
         cv2.imwrite(photo_path, self.result_image)
@@ -199,7 +185,7 @@ class PhotoSelectWindow_4(BaseWindow):
         qr_path = make_qr(
             download_url=download_url,
             save_dir=state.shared_dir,
-            photo_id=now
+            photo_id=photo_id
         )
 
         self.w = QRWindow(qr_path, photo_path)
@@ -207,41 +193,35 @@ class PhotoSelectWindow_4(BaseWindow):
         self.close()
 
 
-
 class GoodbyeWindow(BaseWindow):
     """
     결과 출력 및 마지막 화면
     """
+
     def __init__(self):
         super().__init__()
         uic.loadUi("./page_ui_v3/goodbye.ui", self)
 
-        # Session1에 흑색 이미지 하나 추가(원래 코드 패턴 유지)
+        # Session1에 흑색 이미지 하나 추가
         photo_dir = state.session1_dir
         photos = sorted(os.listdir(photo_dir))
 
-        if photos:
-            try:
-                num = int(photos[-1][-8:-4]) + 1
-            except ValueError:
-                num = 1
-        else:
+        try:
+            num = int(photos[-1][-8:-4]) + 1 if photos else 1
+        except ValueError:
             num = 1
 
-        name = (f"DSC_{num:05d}.jpg")
+        name = f"DSC_{num:05d}.jpg"
         temp = cv2.imread('./black.jpg')
         cv2.imwrite(os.path.join(photo_dir, name), temp)
 
-        # 결과 이미지 중 최신 파일
+        # 결과 이미지 출력
         self.img_dir = state.result_dir
         imgs = sorted(os.listdir(self.img_dir))
-        self.img = imgs[-1]
-        self.img_path = os.path.join(self.img_dir, self.img)
+        self.img_path = os.path.join(self.img_dir, imgs[-1])
 
-        # 프린트
         self._print_image(self.img_path)
 
-        # 몇 초 후 메인 화면으로 복귀
         from PyQt5.QtCore import QTimer
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._go_main)
@@ -252,9 +232,7 @@ class GoodbyeWindow(BaseWindow):
             img = Image.open(file_path)
             img = img.rotate(90, expand=True)
 
-            move_left = 40
-            move_up = 38
-            rotated = ImageOps.expand(img, border=(move_left, move_up, 0, 0), fill='white')
+            rotated = ImageOps.expand(img, border=(40, 38, 0, 0), fill='white')
 
             printer = win32print.OpenPrinter(state.printer_name)
             hdc = win32ui.CreateDC()
@@ -264,7 +242,7 @@ class GoodbyeWindow(BaseWindow):
                 hdc.StartDoc('Print Job')
                 hdc.StartPage()
                 dib = ImageWin.Dib(rotated)
-                dib.draw(hdc.GetHandleOutput(), (0, 0, rotated.size[0], rotated.size[1]))
+                dib.draw(hdc.GetHandleOutput(), (0, 0, *rotated.size))
                 hdc.EndPage()
                 hdc.EndDoc()
 
