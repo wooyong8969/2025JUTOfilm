@@ -17,6 +17,7 @@ from PyQt5.QtGui import QPixmap
 
 from windows.base import BaseWindow
 from state import state
+from utils.frame_config import PHOTO_ASPECT
 
 
 class CaptureWindow(BaseWindow):
@@ -60,7 +61,7 @@ class CaptureWindow(BaseWindow):
     # 4컷 비율 crop (미리보기 + 저장 공통)
     # ==============================
     def _crop_for_4cut(self, img):
-        target_ratio = 4/3
+        target_ratio = PHOTO_ASPECT
         h, w, _ = img.shape
         cur_ratio = w / h
 
@@ -162,7 +163,7 @@ class CaptureWindow(BaseWindow):
 
         self.count_label_2.clear()
         self.label_2.setPixmap(
-            QPixmap('./img/pages_img_2025/슬라이드7.png')
+            QPixmap('./pages_img_2025/슬라이드7.png')
         )
 
         QTimer.singleShot(3000, self._go_next)

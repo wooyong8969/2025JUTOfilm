@@ -21,6 +21,7 @@ from windows.base import BaseWindow
 from windows.qr_window import QRWindow
 from utils.qr import make_qr
 from state import state
+from utils.frame_config import PHOTO_ASPECT
 
 
 class PhotoSelectWindow_4(BaseWindow):
@@ -62,7 +63,7 @@ class PhotoSelectWindow_4(BaseWindow):
         # =========================
         # UI 썸네일
         # =========================
-        self.photo.setPixmap(QPixmap('./white.png'))
+        self.photo.setPixmap(QPixmap('./pages_img_2025/white.png'))
         self.photo_1.setPixmap(QPixmap(self.cut_files[0]).scaled(QSize(450, 300)))
         self.photo_2.setPixmap(QPixmap(self.cut_files[1]).scaled(QSize(450, 300)))
         self.photo_3.setPixmap(QPixmap(self.cut_files[2]).scaled(QSize(450, 300)))
@@ -99,7 +100,7 @@ class PhotoSelectWindow_4(BaseWindow):
         image = cv2.imread(file_path)
         image = cv2.resize(image, (2736, 1824), cv2.INTER_CUBIC)
 
-        target_ratio = 4/3
+        target_ratio = PHOTO_ASPECT
         h, w, _ = image.shape
         cur_ratio = w / h
 
@@ -114,14 +115,14 @@ class PhotoSelectWindow_4(BaseWindow):
 
     def _merge_4cut(self, frame_path, f1, f2, f3, f4):
         def safe(p):
-            return p if p else './white_5.png'
+            return p if p else './pages_img_2025/white.png'
 
         # 프레임(RGBA) 읽기
         frame_rgba = cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)  # (H,W,4)
         fh, fw = frame_rgba.shape[:2]
 
         # 배경 캔버스(프레임 크기와 동일하게)
-        main_image = cv2.imread('./white.png')
+        main_image = cv2.imread('./pages_img_2025/white.png')
         if main_image is None or main_image.shape[:2] != (fh, fw):
             main_image = np.full((fh, fw, 3), 255, dtype=np.uint8)
 
@@ -251,7 +252,7 @@ class GoodbyeWindow(BaseWindow):
             num = 1
 
         name = f"DSC_{num:05d}.jpg"
-        temp = cv2.imread('./black.jpg')
+        temp = np.zeros((300, 300, 3), dtype=np.uint8)
         cv2.imwrite(os.path.join(photo_dir, name), temp)
 
         # 결과 이미지 출력
