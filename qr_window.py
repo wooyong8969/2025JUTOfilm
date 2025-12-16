@@ -8,7 +8,7 @@ from PyQt5 import uic
 class QRWindow(QMainWindow):
     def __init__(self, qr_path):
         super().__init__()
-        uic.loadUi("./page_ui_v3/qr.ui", self)
+        uic.loadUi("./page_ui_v4/qr.ui", self)
 
         self.qr_label.setPixmap(
             QPixmap(qr_path).scaled(

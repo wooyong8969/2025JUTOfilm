@@ -25,7 +25,7 @@ class CaptureWindow(BaseWindow):
     """
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v3/capture.ui", self)
+        uic.loadUi("./page_ui_v4/capture.ui", self)
 
         self.cap = cv2.VideoCapture(0)
         if not self.cap.isOpened():
@@ -162,7 +162,7 @@ class CaptureWindow(BaseWindow):
 
         self.count_label_2.clear()
         self.label_2.setPixmap(
-            QPixmap('./img/pages_v4/슬라이드8.png')
+            QPixmap('./img/pages_v5/슬라이드7.png')
         )
 
         QTimer.singleShot(3000, self._go_next)

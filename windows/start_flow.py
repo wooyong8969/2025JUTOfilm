@@ -18,7 +18,7 @@ class MainWindow(BaseWindow):
     """
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v3/main.ui", self)
+        uic.loadUi("./page_ui_v4/main.ui", self)
         self.start.clicked.connect(self.on_start)
 
     def on_start(self):
@@ -31,7 +31,7 @@ class ExplainWindow(BaseWindow):
     """
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v3/explain.ui", self)
+        uic.loadUi("./page_ui_v4/explain.ui", self)
 
         self.move_next.clicked.connect(self.on_next)
         self.move_previous.clicked.connect(self.on_prev)
@@ -49,7 +49,7 @@ class NumSelectWindow(BaseWindow):
     """
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v3/num_select.ui", self)
+        uic.loadUi("./page_ui_v4/num_select.ui", self)
 
         self.max_num = 4
         state.print_num = 1

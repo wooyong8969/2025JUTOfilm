@@ -29,7 +29,7 @@ class PhotoSelectWindow_4(BaseWindow):
 
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v3/photo_select_4.ui", self)
+        uic.loadUi("./page_ui_v4/photo_select_4.ui", self)
 
         # =========================
         # 디렉토리 준비
@@ -200,7 +200,7 @@ class GoodbyeWindow(BaseWindow):
 
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v3/goodbye.ui", self)
+        uic.loadUi("./page_ui_v4/goodbye.ui", self)
 
         # Session1에 흑색 이미지 하나 추가
         photo_dir = state.session1_dir

@@ -17,7 +17,7 @@ class FrameSelectWindow_4(BaseWindow):
     """
     def __init__(self):
         super().__init__()
-        uic.loadUi("./page_ui_v3/frame_select_4.ui", self)
+        uic.loadUi("./page_ui_v4/frame_select_4.ui", self)
 
         state.frame_path = None
         state.frame_index = None
