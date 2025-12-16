@@ -28,7 +28,7 @@ class CaptureWindow(BaseWindow):
         super().__init__()
         uic.loadUi("./page_ui_2025/capture.ui", self)
 
-        self.cap = cv2.VideoCapture(1)
+        self.cap = cv2.VideoCapture(1)  # <수정해야할곳>
         if not self.cap.isOpened():
             raise RuntimeError("웹캠을 열 수 없습니다.")
 
@@ -86,18 +86,21 @@ class CaptureWindow(BaseWindow):
             if not ret:
                 continue
 
-            frame = cv2.flip(frame, 1)  # 거울 효과
+            # 좌우 반전
+            frame = cv2.flip(frame, 1)
+
+            # 촬영 기준 크롭 (딱 한 번)
+            frame = self._crop_for_4cut(frame)
+
+            # 저장용 (크롭된 이미지)
             self.last_frame = frame.copy()
 
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = self._crop_for_4cut(frame)
-            frame = cv2.resize(frame, (1400, 1050))
+            # 미리보기용 변환
+            preview = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            preview = cv2.resize(preview, (1400, 1050))
 
-            qImg = qimage2ndarray.array2qimage(frame, normalize=False)
+            qImg = qimage2ndarray.array2qimage(preview, normalize=False)
             self.label.setPixmap(QPixmap.fromImage(qImg))
-
-            time.sleep(0.03)
-
 
     # ==============================
     # 타이머 tick

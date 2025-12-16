@@ -50,7 +50,7 @@ class PhotoSelectWindow_4(BaseWindow):
                 continue
 
             src_path = os.path.join(self.photo_dir, self.photos[-i])
-            cut_img = self._cut_for_4cut(src_path)
+            cut_img = cv2.imread(src_path)
 
             existing = sorted(os.listdir(img_dir))
             num = int(existing[-1][-8:-4]) + 1 if existing else 1
@@ -95,23 +95,6 @@ class PhotoSelectWindow_4(BaseWindow):
     # =====================================================
     # 이미지 처리
     # =====================================================
-
-    def _cut_for_4cut(self, file_path):
-        image = cv2.imread(file_path)
-        image = cv2.resize(image, (2736, 1824), cv2.INTER_CUBIC)
-
-        target_ratio = PHOTO_ASPECT
-        h, w, _ = image.shape
-        cur_ratio = w / h
-
-        if cur_ratio > target_ratio:
-            new_w = int(h * target_ratio)
-            x = (w - new_w) // 2
-            return image[:, x:x + new_w]
-        else:
-            new_h = int(w / target_ratio)
-            y = (h - new_h) // 2
-            return image[y:y + new_h, :]
 
     def _merge_4cut(self, frame_path, f1, f2, f3, f4):
         def safe(p):
@@ -162,8 +145,8 @@ class PhotoSelectWindow_4(BaseWindow):
 
         # 사진 4장 붙이기(창 크기에 맞춤)
         for p, (x, y, w, h) in zip((f1, f2, f3, f4), rects):
-            img = self._cut_for_4cut(safe(p))
-            img = fit_to_box(img, w, h)
+            img = cv2.imread(safe(p))
+            img = cv2.resize(img, (w, h))
             main_image[y:y+h, x:x+w] = img
 
         # 프레임 덮기(알파가 있는 부분만)
