@@ -40,7 +40,8 @@ class CaptureWindow(BaseWindow):
         self.count = self.timelimit + 1
         self.num = 1
 
-        self.last_frame = None  # 마지막 웹캠 프레임 저장용
+        self.last_frame = None          # 마지막 웹캠 프레임 저장용
+        self.preview_qimage = None      # UI 표시용 프레임
 
         # 미리보기 스레드
         self.thread = threading.Thread(
@@ -54,7 +55,12 @@ class CaptureWindow(BaseWindow):
         self.timer.timeout.connect(self._tick)
         self.timer.start(1000)
 
-        self.force_capture = False  # N키 중복 방지
+        # UI 갱신 타이머 (메인 스레드)
+        self.preview_timer = QTimer(self)
+        self.preview_timer.timeout.connect(self._update_preview_ui)
+        self.preview_timer.start(30)
+
+        self.force_capture = False      # N키 중복 방지
 
 
     # ==============================
@@ -78,7 +84,7 @@ class CaptureWindow(BaseWindow):
 
 
     # ==============================
-    # 웹캠 미리보기
+    # 웹캠 프레임 처리 (서브 스레드)
     # ==============================
     def _run_preview(self):
         while self.running:
@@ -89,18 +95,40 @@ class CaptureWindow(BaseWindow):
             # 좌우 반전
             frame = cv2.flip(frame, 1)
 
-            # 촬영 기준 크롭 (딱 한 번)
+            # 촬영 기준 크롭
             frame = self._crop_for_4cut(frame)
 
-            # 저장용 (크롭된 이미지)
+            # 저장용
             self.last_frame = frame.copy()
 
             # 미리보기용 변환
             preview = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             preview = cv2.resize(preview, (1400, 1050))
 
-            qImg = qimage2ndarray.array2qimage(preview, normalize=False)
-            self.label.setPixmap(QPixmap.fromImage(qImg))
+            self.preview_qimage = qimage2ndarray.array2qimage(
+                preview,
+                normalize=False
+            )
+
+            time.sleep(0.03)
+
+
+    # ==============================
+    # 웹캠 미리보기 UI 업데이트 (메인 스레드)
+    # ==============================
+    def _update_preview_ui(self):
+        if not self.running:
+            return
+        if self.preview_qimage is None:
+            return
+
+        pixmap = QPixmap.fromImage(self.preview_qimage).scaled(
+            self.label.size(),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        )
+        self.label.setPixmap(pixmap)
+
 
     # ==============================
     # 타이머 tick
@@ -161,12 +189,23 @@ class CaptureWindow(BaseWindow):
     # ==============================
     def _finish_capture(self):
         self.running = False
-        self.timer.stop()
-        self.cap.release()
 
+        self.timer.stop()
+        self.preview_timer.stop()
+
+        if self.cap is not None:
+            self.cap.release()
+
+        self.preview_qimage = None
+        self.label.clear()
         self.count_label_2.clear()
+
         self.label_2.setPixmap(
-            QPixmap('./pages_img_2025/슬라이드7.png')
+            QPixmap('./pages_img_2025/슬라이드7.png').scaled(
+                self.label_2.size(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
         )
 
         QTimer.singleShot(3000, self._go_next)
@@ -188,7 +227,7 @@ class CaptureWindow(BaseWindow):
         if event.key() == Qt.Key_N:
             if not self.force_capture:
                 self.force_capture = True
-                self.count = 1  # 다음 tick에서 바로 촬영
+                self.count = 1
                 QTimer.singleShot(0, self._reset_force_flag)
 
         # Q 키 → 전체 종료

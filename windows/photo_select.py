@@ -64,12 +64,12 @@ class PhotoSelectWindow_4(BaseWindow):
         # UI 썸네일
         # =========================
         self.photo.setPixmap(QPixmap('./pages_img_2025/white.png'))
-        self.photo_1.setPixmap(QPixmap(self.cut_files[0]).scaled(QSize(450, 300)))
-        self.photo_2.setPixmap(QPixmap(self.cut_files[1]).scaled(QSize(450, 300)))
-        self.photo_3.setPixmap(QPixmap(self.cut_files[2]).scaled(QSize(450, 300)))
-        self.photo_4.setPixmap(QPixmap(self.cut_files[3]).scaled(QSize(450, 300)))
-        self.photo_5.setPixmap(QPixmap(self.cut_files[4]).scaled(QSize(450, 300)))
-        self.photo_6.setPixmap(QPixmap(self.cut_files[5]).scaled(QSize(450, 300)))
+        self.photo_1.setPixmap(QPixmap(self.cut_files[0]).scaled(QSize(340, 255)))
+        self.photo_2.setPixmap(QPixmap(self.cut_files[1]).scaled(QSize(340, 255)))
+        self.photo_3.setPixmap(QPixmap(self.cut_files[2]).scaled(QSize(340, 255)))
+        self.photo_4.setPixmap(QPixmap(self.cut_files[3]).scaled(QSize(340, 255)))
+        self.photo_5.setPixmap(QPixmap(self.cut_files[4]).scaled(QSize(340, 255)))
+        self.photo_6.setPixmap(QPixmap(self.cut_files[5]).scaled(QSize(340, 255)))
 
         # =========================
         # 선택 상태
@@ -125,23 +125,6 @@ class PhotoSelectWindow_4(BaseWindow):
         top = sorted(rects[:2], key=lambda r: r[0])
         bot = sorted(rects[2:], key=lambda r: r[0])
         rects = top + bot
-
-        def fit_to_box(img, w, h):
-            ih, iw = img.shape[:2]
-            target = w / h
-            src = iw / ih
-
-            # 비율 맞추기 위해 중앙 크롭
-            if src > target:
-                new_w = int(ih * target)
-                x0 = (iw - new_w) // 2
-                img = img[:, x0:x0 + new_w]
-            else:
-                new_h = int(iw / target)
-                y0 = (ih - new_h) // 2
-                img = img[y0:y0 + new_h, :]
-
-            return cv2.resize(img, (w, h))
 
         # 사진 4장 붙이기(창 크기에 맞춤)
         for p, (x, y, w, h) in zip((f1, f2, f3, f4), rects):
