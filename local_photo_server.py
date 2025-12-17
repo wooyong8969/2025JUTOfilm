@@ -7,7 +7,7 @@ from flask import Flask, request, send_from_directory, jsonify, abort
 # ========================
 
 BASE_DIR = os.path.abspath("shared_photos")  # 사진 저장 폴더
-PORT = 5000                                 # 서버 포트
+PORT = 5000                                  # 서버 포트
 
 os.makedirs(BASE_DIR, exist_ok=True)
 

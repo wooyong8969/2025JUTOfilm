@@ -11,7 +11,7 @@ class QRWindow(QMainWindow):
     def __init__(self, qr_path, result_path):
         super().__init__()
         uic.loadUi("./page_ui_2025/qr.ui", self)
-
+    
         self.result_path = result_path
 
         self.qr_label.setPixmap(
