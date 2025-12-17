@@ -17,11 +17,12 @@ from PIL import Image, ImageWin, ImageOps
 import win32print
 import win32ui
 
-from windows.base import BaseWindow
-from windows.qr_window import QRWindow
+from windows.base_0 import BaseWindow
+from windows.qr_window_5 import QRWindow
 from utils.qr import make_qr
 from state import state
 from utils.frame_config import PHOTO_ASPECT
+from utils.merge import merge_4cut
 
 
 class PhotoSelectWindow_4(BaseWindow):
@@ -96,59 +97,20 @@ class PhotoSelectWindow_4(BaseWindow):
     # 이미지 처리
     # =====================================================
 
-    def _merge_4cut(self, frame_path, f1, f2, f3, f4):
-        def safe(p):
-            return p if p else './pages_img_2025/white.png'
-
-        # 프레임(RGBA) 읽기
-        frame_rgba = cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)  # (H,W,4)
-        fh, fw = frame_rgba.shape[:2]
-
-        # 배경 캔버스(프레임 크기와 동일하게)
-        main_image = cv2.imread('./pages_img_2025/white.png')
-        if main_image is None or main_image.shape[:2] != (fh, fw):
-            main_image = np.full((fh, fw, 3), 255, dtype=np.uint8)
-
-        alpha = frame_rgba[:, :, 3]
-
-        # 프레임에서 "사진이 보여야 하는 창" 찾기: 보통 창 부분이 투명(alpha==0)입니다.
-        win = (alpha == 0).astype(np.uint8) * 255
-
-        contours, _ = cv2.findContours(win, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        rects = [cv2.boundingRect(c) for c in contours]  # (x,y,w,h)
-
-        # 큰 4개만 사용
-        rects = sorted(rects, key=lambda r: r[2]*r[3], reverse=True)[:4]
-
-        # 위/아래 행으로 정렬해서 [좌상, 우상, 좌하, 우하] 순서로 맞춤
-        rects = sorted(rects, key=lambda r: (r[1], r[0]))
-        top = sorted(rects[:2], key=lambda r: r[0])
-        bot = sorted(rects[2:], key=lambda r: r[0])
-        rects = top + bot
-
-        # 사진 4장 붙이기(창 크기에 맞춤)
-        for p, (x, y, w, h) in zip((f1, f2, f3, f4), rects):
-            img = cv2.imread(safe(p))
-            img = cv2.resize(img, (w, h))
-            main_image[y:y+h, x:x+w] = img
-
-        # 프레임 덮기(알파가 있는 부분만)
-        frame_bgr = frame_rgba[:, :, :3]
-        cv2.copyTo(frame_bgr, alpha, main_image)
-
-        return main_image
+    
 
 
     def _update_preview(self):
-        res = self._merge_4cut(state.frame_path, *state.selected)
+        # 임시 미리보기 프레임(예: 1번)로만 보여주기
+        res = merge_4cut('./frame_2025/1.png', *state.selected)
         self.result_image = res
-        #res = cv2.rotate(res, cv2.ROTATE_90_CLOCKWISE)
+
         rgb = cv2.cvtColor(res, cv2.COLOR_BGR2RGB)
         rgb = cv2.resize(rgb, (910, 615))
         h, w, c = rgb.shape
-
         qimg = QImage(rgb.data, w, h, w * c, QImage.Format_RGB888)
         self.photo.setPixmap(QPixmap.fromImage(qimg))
+
 
     def _toggle_select(self, idx, widget):
         if self.button_slots[idx] == -1:
@@ -176,8 +138,12 @@ class PhotoSelectWindow_4(BaseWindow):
             QMessageBox.about(self, '주토필름', '사진 4장을 모두 선택해주세요')
             return
 
-        os.makedirs(state.shared_dir, exist_ok=True)
+        state.selected_frame_path = None
+        from windows.frame_select_4 import FrameSelectWindow_4
+        self.goto(FrameSelectWindow_4)
 
+'''
+        os.makedirs(state.shared_dir, exist_ok=True)
         # 암호화된 사진 ID
         photo_id = secrets.token_hex(16)
 
@@ -197,8 +163,8 @@ class PhotoSelectWindow_4(BaseWindow):
         self.w = QRWindow(qr_path, photo_path)
         self.w.showFullScreen()
         self.close()
-
-
+'''
+'''
 class GoodbyeWindow(BaseWindow):
     """
     결과 출력 및 마지막 화면
@@ -262,3 +228,4 @@ class GoodbyeWindow(BaseWindow):
         self.timer.stop()
         from windows.start_flow import MainWindow
         self.goto(MainWindow)
+'''

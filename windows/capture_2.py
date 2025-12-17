@@ -15,7 +15,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap
 
-from windows.base import BaseWindow
+from windows.base_0 import BaseWindow
 from state import state
 from utils.frame_config import PHOTO_ASPECT
 
@@ -28,7 +28,7 @@ class CaptureWindow(BaseWindow):
         super().__init__()
         uic.loadUi("./page_ui_2025/capture.ui", self)
 
-        self.cap = cv2.VideoCapture(2)  # <수정해야할곳>
+        self.cap = cv2.VideoCapture(1)  # <수정해야할곳>
         if not self.cap.isOpened():
             raise RuntimeError("웹캠을 열 수 없습니다.")
 
@@ -215,7 +215,7 @@ class CaptureWindow(BaseWindow):
     # 다음 화면
     # ==============================
     def _go_next(self):
-        from windows.photo_select import PhotoSelectWindow_4
+        from windows.photo_select_3 import PhotoSelectWindow_4
         self.goto(PhotoSelectWindow_4)
 
 

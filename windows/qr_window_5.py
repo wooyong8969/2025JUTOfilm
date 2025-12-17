@@ -42,7 +42,7 @@ class QRWindow(QMainWindow):
             )
 
     def _exit(self):
-        from windows.start_flow import MainWindow
+        from windows.start_flow_1 import MainWindow
         self.w = MainWindow()
         self.w.showFullScreen()
         self.close()

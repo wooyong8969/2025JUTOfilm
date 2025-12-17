@@ -8,7 +8,7 @@ from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
-from windows.base import BaseWindow
+from windows.base_0 import BaseWindow
 from state import state
 
 
@@ -41,6 +41,7 @@ class ExplainWindow(BaseWindow):
 
     def on_next(self):
         self.goto(NumSelectWindow)
+    
 
 
 class NumSelectWindow(BaseWindow):
@@ -88,6 +89,6 @@ class NumSelectWindow(BaseWindow):
         self.goto(ExplainWindow)
 
     def on_next(self):
-        # 4컷 프레임 선택 화면으로 이동
-        from windows.frame_select import FrameSelectWindow_4
-        self.goto(FrameSelectWindow_4)
+        from windows.capture_2 import CaptureWindow
+        self.goto(CaptureWindow)
+    

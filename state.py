@@ -23,7 +23,7 @@ class AppState:
         self.selected = [0, 0, 0, 0]
 
         # 프린터 이름
-        self.printer_name = "Canon SELPHY CP1300"
+        self.printer_name = "Canon SELPHY CP1500"
 
         # 디렉토리 경로
         self.session1_dir = r"C:\digiCamControl\Session1"
@@ -39,8 +39,7 @@ class AppState:
         self.shared_dir = os.path.join("shared_photos")
 
         # 서버
-        self.server_ip = "10.138.24.168"      # <수정해야할곳>
-        # self.server_ip = "10.138.25.216"      # <수정해야할곳>
-        #self.server_ip = "192.168.137.1"      # <수정해야할곳>
+        #self.server_ip = "10.138.24.168"      # <수정해야할곳>
+        self.server_ip = "10.138.25.216"      # <수정해야할곳>
 
 state = AppState()
