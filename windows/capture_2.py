@@ -28,7 +28,9 @@ class CaptureWindow(BaseWindow):
         super().__init__()
         uic.loadUi("./page_ui_2025/capture.ui", self)
 
-        self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # <수정해야할곳>
+        self.label.setAlignment(Qt.AlignCenter)
+
+        self.cap = cv2.VideoCapture(2, cv2.CAP_DSHOW)  # <수정해야할곳>
         if not self.cap.isOpened():
             raise RuntimeError("웹캠을 열 수 없습니다.")
 
@@ -103,7 +105,7 @@ class CaptureWindow(BaseWindow):
 
             # 미리보기용 변환
             preview = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            preview = cv2.resize(preview, (1400, 1050))
+            # preview = cv2.resize(preview, (1400, 1050))
 
             self.preview_qimage = qimage2ndarray.array2qimage(
                 preview,
@@ -178,7 +180,7 @@ class CaptureWindow(BaseWindow):
         else:
             num = 1
 
-        filename = f"WEBCAM_{num:05d}.jpg"
+        filename = f"WEBCAM_{num:05d}.png"
         path = os.path.join(state.session1_dir, filename)
 
         cv2.imwrite(path, self.last_frame)
