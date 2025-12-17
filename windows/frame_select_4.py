@@ -133,7 +133,7 @@ class FrameSelectWindow_4(BaseWindow):
         os.makedirs(state.shared_dir, exist_ok=True)
 
         photo_id = secrets.token_hex(16)
-        photo_filename = f"{photo_id}.jpg"
+        photo_filename = f"{photo_id}.png"
         photo_path = os.path.join(state.shared_dir, photo_filename)
 
         ok = cv2.imwrite(photo_path, self.result_image)
