@@ -8,7 +8,6 @@ import time
 import os
 
 import cv2
-import numpy as np
 import qimage2ndarray
 
 from PyQt5 import uic
@@ -22,62 +21,71 @@ from utils.frame_config import PHOTO_ASPECT
 
 class CaptureWindow(BaseWindow):
     """
-    웹캠 기반 촬영 화면 (4컷 전용)
+    OBS Virtual Camera 기반 촬영 화면 (4컷 전용)
     """
     def __init__(self):
         super().__init__()
         uic.loadUi("./page_ui_2025/capture.ui", self)
 
+        # ===== UI =====
         self.label.setAlignment(Qt.AlignCenter)
 
-        self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # <수정해야할곳>
+        # ===== Camera (OBS Virtual Camera index) =====
+        self.cap = cv2.VideoCapture(2, cv2.CAP_DSHOW)
         if not self.cap.isOpened():
-            raise RuntimeError("웹캠을 열 수 없습니다.")
+            raise RuntimeError("카메라(OBS Virtual Camera)를 열 수 없습니다.")
 
         self.running = True
 
+        # ===== Capture config =====
         self.timelimit = state.timelimit
         self.numlimit = state.numlimit
 
         self.count = self.timelimit + 1
         self.num = 1
 
-        self.last_frame = None          # 마지막 웹캠 프레임 저장용
-        self.preview_qimage = None      # UI 표시용 프레임
+        self.last_frame = None      # crop 완료된 저장용 프레임
+        self.preview_qimage = None  # UI 표시용
 
-        # 미리보기 스레드
+        # ===== Preview thread =====
         self.thread = threading.Thread(
             target=self._run_preview,
             daemon=True
         )
         self.thread.start()
 
-        # 카운트다운 타이머
+        # ===== Countdown timer =====
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
         self.timer.start(1000)
 
-        # UI 갱신 타이머 (메인 스레드)
+        # ===== UI refresh timer =====
         self.preview_timer = QTimer(self)
         self.preview_timer.timeout.connect(self._update_preview_ui)
         self.preview_timer.start(30)
 
-        self.force_capture = False      # N키 중복 방지
+        self.force_capture = False
 
 
-    # ==============================
-    # 4컷 비율 crop (미리보기 + 저장 공통)
-    # ==============================
+    # ==================================================
+    # 4컷 비율 crop (절대 resize 이전)
+    # ==================================================
     def _crop_for_4cut(self, img):
+        """
+        img: 원본 비율이 유지된 프레임
+        return: PHOTO_ASPECT 기준으로 중앙 crop된 프레임
+        """
         target_ratio = PHOTO_ASPECT
         h, w, _ = img.shape
         cur_ratio = w / h
 
         if cur_ratio > target_ratio:
+            # 가로가 더 긴 경우 → 좌우 crop
             new_w = int(h * target_ratio)
             x = (w - new_w) // 2
             img = img[:, x:x + new_w]
         else:
+            # 세로가 더 긴 경우 → 상하 crop
             new_h = int(w / target_ratio)
             y = (h - new_h) // 2
             img = img[y:y + new_h, :]
@@ -85,28 +93,28 @@ class CaptureWindow(BaseWindow):
         return img
 
 
-    # ==============================
-    # 웹캠 프레임 처리 (서브 스레드)
-    # ==============================
+    # ==================================================
+    # Camera preview thread
+    # ==================================================
     def _run_preview(self):
         while self.running:
             ret, frame = self.cap.read()
             if not ret:
                 continue
+            
+            frame = cv2.resize(frame, (1920, 1080))
 
-            # 좌우 반전
+            # 좌우 반전 (OBS에서 안 했다면 여기서)
             frame = cv2.flip(frame, 1)
 
-            # 촬영 기준 크롭
-            frame = self._crop_for_4cut(frame)
+            # 비율 기준 crop (resize 금지)
+            cropped = self._crop_for_4cut(frame)
 
-            # 저장용
-            self.last_frame = frame.copy()
+            # 저장용 (crop 결과 그대로)
+            self.last_frame = cropped.copy()
 
-            # 미리보기용 변환
-            preview = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            # preview = cv2.resize(preview, (1400, 1050))
-
+            # UI 미리보기용 변환
+            preview = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
             self.preview_qimage = qimage2ndarray.array2qimage(
                 preview,
                 normalize=False
@@ -115,13 +123,11 @@ class CaptureWindow(BaseWindow):
             time.sleep(0.03)
 
 
-    # ==============================
-    # 웹캠 미리보기 UI 업데이트 (메인 스레드)
-    # ==============================
+    # ==================================================
+    # UI preview update (메인 스레드)
+    # ==================================================
     def _update_preview_ui(self):
-        if not self.running:
-            return
-        if self.preview_qimage is None:
+        if not self.running or self.preview_qimage is None:
             return
 
         pixmap = QPixmap.fromImage(self.preview_qimage).scaled(
@@ -132,9 +138,9 @@ class CaptureWindow(BaseWindow):
         self.label.setPixmap(pixmap)
 
 
-    # ==============================
-    # 타이머 tick
-    # ==============================
+    # ==================================================
+    # Countdown tick
+    # ==================================================
     def _tick(self):
         if self.count > 1:
             self.count -= 1
@@ -146,7 +152,7 @@ class CaptureWindow(BaseWindow):
                 self.count_label_2.setPixmap(QPixmap('./count/1.png'))
 
         else:
-            # 촬영 타이밍
+            # 촬영 시점
             self.count_label.clear()
             self.count = self.timelimit + 1
             self.num += 1
@@ -158,13 +164,12 @@ class CaptureWindow(BaseWindow):
                     QPixmap(f'./count/{self.num}.png')
                 )
             else:
-                # 촬영 종료
                 self._finish_capture()
 
 
-    # ==============================
-    # 사진 1장 저장
-    # ==============================
+    # ==================================================
+    # Save one photo (crop 결과 그대로)
+    # ==================================================
     def _capture_one(self):
         if self.last_frame is None:
             return
@@ -186,9 +191,9 @@ class CaptureWindow(BaseWindow):
         cv2.imwrite(path, self.last_frame)
 
 
-    # ==============================
-    # 촬영 종료 처리
-    # ==============================
+    # ==================================================
+    # Finish capture
+    # ==================================================
     def _finish_capture(self):
         self.running = False
 
@@ -213,17 +218,17 @@ class CaptureWindow(BaseWindow):
         QTimer.singleShot(3000, self._go_next)
 
 
-    # ==============================
-    # 다음 화면
-    # ==============================
+    # ==================================================
+    # Next window
+    # ==================================================
     def _go_next(self):
         from windows.photo_select_3 import PhotoSelectWindow_4
         self.goto(PhotoSelectWindow_4)
 
 
-    # ==============================
-    # 키 입력 처리
-    # ==============================
+    # ==================================================
+    # Key events
+    # ==================================================
     def keyPressEvent(self, event):
         # N 키 → 즉시 촬영
         if event.key() == Qt.Key_N:
