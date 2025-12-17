@@ -13,8 +13,8 @@ class AppState:
         self.size = 4
 
         # 선택된 프레임 정보
-        self.frame_path = None      # './frame_v2/4frame/1.png' 같은 경로
-        self.frame_index = None     # 1, 2, 3 ...
+        self.frame_path = f'./frame_2025/01.png'      # './frame_v2/4frame/1.png' 같은 경로
+        self.frame_index = 1     # 1, 2, 3 ...
 
         # 인쇄 매수
         self.print_num = 1

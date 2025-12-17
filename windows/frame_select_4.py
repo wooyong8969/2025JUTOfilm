@@ -27,10 +27,17 @@ class FrameSelectWindow_1(BaseWindow):
         super().__init__()
         uic.loadUi("./page_ui_2025/frame_select_1.ui", self)
 
-        state.frame_path = None
-        state.frame_index = None
-
+        state.frame_path = f'./frame_2025/01.png'
+        state.frame_index = 1
         self.result_image = None  # 최종 합성 결과(BGR)
+
+        if self._build_result_image():
+            self._update_preview()
+        else:
+            # 사진 선택이 아직 안 됐거나 합성 실패 시 미리보기 초기화
+            self.photo.setPixmap(QPixmap())
+
+        
 
         self.move_previous.clicked.connect(self.on_prev)
         self.move_next.clicked.connect(self.on_next)
@@ -44,7 +51,9 @@ class FrameSelectWindow_1(BaseWindow):
         self.frame_choice_6.clicked.connect(lambda: self.select_frame(6))
 
         # 초기 미리보기 비우기
-        self.photo.setPixmap(QPixmap())
+        #self.photo.setPixmap(QPixmap())
+        self.frame_1.setPixmap(QPixmap('./pages_img_2025/print_num/check.png'))
+        self.frame_1.setScaledContents(True)
 
     def select_frame(self, n: int):
         """
@@ -158,10 +167,16 @@ class FrameSelectWindow_2(BaseWindow):
         super().__init__()
         uic.loadUi("./page_ui_2025/frame_select_2.ui", self)
 
-        state.frame_path = None
-        state.frame_index = None
 
+        state.frame_path = f'./frame_2025/07.png'
+        state.frame_index = 7
         self.result_image = None  # 최종 합성 결과(BGR)
+
+        if self._build_result_image():
+            self._update_preview()
+        else:
+            # 사진 선택이 아직 안 됐거나 합성 실패 시 미리보기 초기화
+            self.photo.setPixmap(QPixmap())
 
         self.move_previous.clicked.connect(self.on_prev)
         self.move_next.clicked.connect(self.on_next)
@@ -175,7 +190,9 @@ class FrameSelectWindow_2(BaseWindow):
         self.frame_choice_12.clicked.connect(lambda: self.select_frame(12))
 
         # 초기 미리보기 비우기
-        self.photo.setPixmap(QPixmap())
+        #self.photo.setPixmap(QPixmap())
+        self.frame_7.setPixmap(QPixmap('./pages_img_2025/print_num/check.png'))
+        self.frame_7.setScaledContents(True)
 
     def select_frame(self, n: int):
         """
