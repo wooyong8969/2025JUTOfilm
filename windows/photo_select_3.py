@@ -102,7 +102,7 @@ class PhotoSelectWindow_4(BaseWindow):
 
     def _update_preview(self):
         # 임시 미리보기 프레임(예: 1번)로만 보여주기
-        res = merge_4cut('./frame_2025/1.png', *state.selected)
+        res = merge_4cut('./frame_2025/01.png', *state.selected)
         self.result_image = res
 
         rgb = cv2.cvtColor(res, cv2.COLOR_BGR2RGB)

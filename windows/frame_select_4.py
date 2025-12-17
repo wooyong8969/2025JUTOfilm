@@ -56,7 +56,7 @@ class FrameSelectWindow_4(BaseWindow):
         프레임 번호 n 선택
         """
         self._update_border(n)
-        state.frame_path = f'./frame_2025/{n}.png'
+        state.frame_path = f'./frame_2025/{n:02d}.png'
         state.frame_index = n
 
         # 프레임 선택 즉시 합성 + 미리보기
