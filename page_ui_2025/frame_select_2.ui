@@ -27,7 +27,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>../pages_img_2025/슬라이드9.png</pixmap>
+     <pixmap>../pages_img_2025/슬라이드10.png</pixmap>
     </property>
    </widget>
    <widget class="QPushButton" name="frame_choice_7">
@@ -274,9 +274,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>380</y>
-      <width>111</width>
-      <height>331</height>
+      <y>460</y>
+      <width>110</width>
+      <height>170</height>
      </rect>
     </property>
     <property name="styleSheet">
