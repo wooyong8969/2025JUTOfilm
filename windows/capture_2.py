@@ -11,8 +11,9 @@ import cv2
 import qimage2ndarray
 
 from PyQt5 import uic
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, QUrl
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 from windows.base_0 import BaseWindow
 from state import state
@@ -47,6 +48,9 @@ class CaptureWindow(BaseWindow):
         self.last_frame = None      # crop 완료된 저장용 프레임
         self.preview_qimage = None  # UI 표시용
 
+        # ===== Shutter sound (MP3) =====
+        self._init_shutter_sound()
+
         # ===== Preview thread =====
         self.thread = threading.Thread(
             target=self._run_preview,
@@ -65,6 +69,31 @@ class CaptureWindow(BaseWindow):
         self.preview_timer.start(30)
 
         self.force_capture = False
+
+
+    # ==================================================
+    # MP3 shutter init / play
+    # ==================================================
+    def _init_shutter_sound(self):
+        # capture.py와 같은 폴더에 shutter.mp3가 있다고 가정함
+        self.shutter_path = os.path.join(os.path.dirname(__file__), "shutter.mp3")
+
+        self.shutter_player = QMediaPlayer(self)
+        if os.path.exists(self.shutter_path):
+            url = QUrl.fromLocalFile(os.path.abspath(self.shutter_path))
+            self.shutter_player.setMedia(QMediaContent(url))
+            self.shutter_player.setVolume(100)
+        else:
+            # 파일이 없으면 조용히 넘어가되, 재생 시도는 하지 않도록 함
+            self.shutter_path = None
+
+    def _play_shutter(self):
+        if not self.shutter_path:
+            return
+        # 연속 촬영에서도 항상 처음부터 재생되도록 stop + position 0 처리
+        self.shutter_player.stop()
+        self.shutter_player.setPosition(0)
+        self.shutter_player.play()
 
 
     # ==================================================
@@ -101,7 +130,7 @@ class CaptureWindow(BaseWindow):
             ret, frame = self.cap.read()
             if not ret:
                 continue
-            
+
             frame = cv2.resize(frame, (1920, 1080))
 
             # 좌우 반전 (OBS에서 안 했다면 여기서)
@@ -173,6 +202,9 @@ class CaptureWindow(BaseWindow):
     def _capture_one(self):
         if self.last_frame is None:
             return
+
+        # 셔터 사운드 먼저 재생
+        self._play_shutter()
 
         os.makedirs(state.session1_dir, exist_ok=True)
 
