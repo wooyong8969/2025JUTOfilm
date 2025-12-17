@@ -139,8 +139,8 @@ class PhotoSelectWindow_4(BaseWindow):
             return
 
         state.selected_frame_path = None
-        from windows.frame_select_4 import FrameSelectWindow_4
-        self.goto(FrameSelectWindow_4)
+        from windows.frame_select_4 import FrameSelectWindow_1
+        self.goto(FrameSelectWindow_1)
 
 '''
         os.makedirs(state.shared_dir, exist_ok=True)

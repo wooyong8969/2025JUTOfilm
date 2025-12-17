@@ -30,7 +30,7 @@
      <pixmap>../pages_img_2025/슬라이드9.png</pixmap>
     </property>
    </widget>
-   <widget class="QPushButton" name="frame_choice_1">
+   <widget class="QPushButton" name="frame_choice_7">
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -49,7 +49,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="frame_choice_2">
+   <widget class="QPushButton" name="frame_choice_8">
     <property name="geometry">
      <rect>
       <x>490</x>
@@ -65,7 +65,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="frame_choice_3">
+   <widget class="QPushButton" name="frame_choice_9">
     <property name="geometry">
      <rect>
       <x>810</x>
@@ -113,7 +113,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="frame_1">
+   <widget class="QLabel" name="frame_7">
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -129,7 +129,7 @@
      <pixmap/>
     </property>
    </widget>
-   <widget class="QLabel" name="frame_2">
+   <widget class="QLabel" name="frame_8">
     <property name="geometry">
      <rect>
       <x>490</x>
@@ -145,7 +145,7 @@
      <pixmap/>
     </property>
    </widget>
-   <widget class="QLabel" name="frame_3">
+   <widget class="QLabel" name="frame_9">
     <property name="geometry">
      <rect>
       <x>810</x>
@@ -161,7 +161,7 @@
      <pixmap/>
     </property>
    </widget>
-   <widget class="QLabel" name="frame_4">
+   <widget class="QLabel" name="frame_10">
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -177,7 +177,7 @@
      <pixmap/>
     </property>
    </widget>
-   <widget class="QPushButton" name="frame_choice_4">
+   <widget class="QPushButton" name="frame_choice_10">
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -193,7 +193,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="frame_choice_6">
+   <widget class="QPushButton" name="frame_choice_12">
     <property name="geometry">
      <rect>
       <x>810</x>
@@ -209,7 +209,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="frame_6">
+   <widget class="QLabel" name="frame_12">
     <property name="geometry">
      <rect>
       <x>810</x>
@@ -225,7 +225,7 @@
      <pixmap/>
     </property>
    </widget>
-   <widget class="QLabel" name="frame_5">
+   <widget class="QLabel" name="frame_11">
     <property name="geometry">
      <rect>
       <x>490</x>
@@ -241,7 +241,7 @@
      <pixmap/>
     </property>
    </widget>
-   <widget class="QPushButton" name="frame_choice_5">
+   <widget class="QPushButton" name="frame_choice_11">
     <property name="geometry">
      <rect>
       <x>490</x>
@@ -270,10 +270,10 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="move_select_2">
+   <widget class="QPushButton" name="move_select_1">
     <property name="geometry">
      <rect>
-      <x>1810</x>
+      <x>0</x>
       <y>380</y>
       <width>111</width>
       <height>331</height>
@@ -287,22 +287,22 @@
     </property>
    </widget>
    <zorder>label</zorder>
-   <zorder>frame_3</zorder>
-   <zorder>frame_2</zorder>
-   <zorder>frame_1</zorder>
-   <zorder>frame_choice_1</zorder>
-   <zorder>frame_choice_2</zorder>
-   <zorder>frame_choice_3</zorder>
+   <zorder>frame_9</zorder>
+   <zorder>frame_8</zorder>
+   <zorder>frame_7</zorder>
    <zorder>move_next</zorder>
    <zorder>move_previous</zorder>
-   <zorder>frame_4</zorder>
-   <zorder>frame_choice_4</zorder>
-   <zorder>frame_6</zorder>
-   <zorder>frame_5</zorder>
-   <zorder>frame_choice_5</zorder>
+   <zorder>frame_10</zorder>
+   <zorder>frame_12</zorder>
+   <zorder>frame_11</zorder>
    <zorder>photo</zorder>
-   <zorder>move_select_2</zorder>
-   <zorder>frame_choice_6</zorder>
+   <zorder>move_select_1</zorder>
+   <zorder>frame_choice_10</zorder>
+   <zorder>frame_choice_11</zorder>
+   <zorder>frame_choice_12</zorder>
+   <zorder>frame_choice_7</zorder>
+   <zorder>frame_choice_8</zorder>
+   <zorder>frame_choice_9</zorder>
   </widget>
  </widget>
  <resources/>
