@@ -1,7 +1,5 @@
 import os
 import uuid
-import time
-import threading
 from flask import Flask, request, send_from_directory, jsonify, abort
 
 # ========================
@@ -10,7 +8,6 @@ from flask import Flask, request, send_from_directory, jsonify, abort
 
 BASE_DIR = os.path.abspath("shared_photos")  # 사진 저장 폴더
 PORT = 5000                                 # 서버 포트
-EXPIRE_SECONDS = 60 * 10                    # 10분 후 자동 삭제
 
 os.makedirs(BASE_DIR, exist_ok=True)
 
@@ -45,7 +42,7 @@ def upload():
 
     return jsonify({
         "id": photo_id,
-        "download_url": f"/photos/{photo_id}"
+        "download_url": f"/photos/{filename}"
     })
 
 # ========================
@@ -65,32 +62,11 @@ def download(filename):
         as_attachment=True
     )
 
-
-# ========================
-# 자동 삭제 스레드
-# ========================
-
-def cleanup_loop():
-    while True:
-        now = time.time()
-        for fname in os.listdir(BASE_DIR):
-            path = os.path.join(BASE_DIR, fname)
-            if os.path.isfile(path):
-                if now - os.path.getmtime(path) > EXPIRE_SECONDS:
-                    try:
-                        os.remove(path)
-                        print(f"[CLEANUP] removed {fname}")
-                    except Exception as e:
-                        print("[CLEANUP ERROR]", e)
-        time.sleep(60)
-
 # ========================
 # 서버 시작
 # ========================
 
 if __name__ == "__main__":
-    threading.Thread(target=cleanup_loop, daemon=True).start()
-
     print("===================================")
     print(" Local Photo Server Running ")
     print(f" Save dir : {BASE_DIR}")

@@ -28,7 +28,7 @@ class CaptureWindow(BaseWindow):
         super().__init__()
         uic.loadUi("./page_ui_2025/capture.ui", self)
 
-        self.cap = cv2.VideoCapture(0)  # <수정해야할곳>
+        self.cap = cv2.VideoCapture(2)  # <수정해야할곳>
         if not self.cap.isOpened():
             raise RuntimeError("웹캠을 열 수 없습니다.")
 
