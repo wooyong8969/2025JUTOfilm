@@ -2,7 +2,8 @@ import requests
 import qrcode
 import os
 
-SERVER_BASE = "http://10.138.24.168:5000"   #<수정해야할곳>
+#SERVER_BASE = "http://10.138.24.168:5000"   #<수정해야할곳>
+SERVER_BASE = "http://10.138.25.216:5000"   #<수정해야할곳>
 
 def upload_photo(image_path):
     url = f"{SERVER_BASE}/upload"

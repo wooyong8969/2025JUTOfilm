@@ -449,6 +449,19 @@
      <string/>
     </property>
    </widget>
+   <widget class="QLabel" name="photo">
+    <property name="geometry">
+     <rect>
+      <x>1000</x>
+      <y>190</y>
+      <width>910</width>
+      <height>615</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>frame_3</zorder>
    <zorder>frame_2</zorder>
@@ -476,6 +489,7 @@
    <zorder>frame_choice_11</zorder>
    <zorder>frame_12</zorder>
    <zorder>frame_choice_12</zorder>
+   <zorder>photo</zorder>
   </widget>
  </widget>
  <resources/>
