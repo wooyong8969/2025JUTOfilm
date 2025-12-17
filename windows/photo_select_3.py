@@ -55,7 +55,7 @@ class PhotoSelectWindow_4(BaseWindow):
 
             existing = sorted(os.listdir(img_dir))
             num = int(existing[-1][-8:-4]) + 1 if existing else 1
-            name = f"CUT_{num:05d}.jpg"
+            name = f"CUT_{num:05d}.png"
             cv2.imwrite(os.path.join(img_dir, name), cut_img)
 
         self.cut_files = sorted(os.listdir(img_dir))[-6:]
